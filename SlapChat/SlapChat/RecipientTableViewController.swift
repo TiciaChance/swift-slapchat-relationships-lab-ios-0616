@@ -1,27 +1,22 @@
 //
-//  TableViewController.swift
+//  RecipientTableViewController.swift
 //  SlapChat
 //
-//  Created by Flatiron School on 7/18/16.
+//  Created by Laticia Chance on 7/25/16.
 //  Copyright © 2016 Flatiron School. All rights reserved.
 //
 
 import UIKit
 
-class TableViewController: UITableViewController {
-
+class RecipientTableViewController: UITableViewController {
     
-    var managedMessageObjects: [Message] = []
-    var recipient: Recipient?
+    var managedRecipientsObjects: [Recipient] = []
     let store: DataStore = DataStore()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let messageSet = recipient?.messages {
-            managedMessageObjects = Array(messageSet)
-        }
-        store.fetchDataMessages()
+        store.fetchDataRecipient()
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -37,8 +32,8 @@ class TableViewController: UITableViewController {
         
         super.viewWillAppear(true)
         
-        store.fetchDataMessages()
-        
+        //store.fetchDataMessages()
+        store.fetchDataRecipient()
         tableView.reloadData()
         
     }
@@ -56,22 +51,34 @@ class TableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return managedMessageObjects.count
+        return store.recipients.count
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("basicCell", forIndexPath: indexPath)
-        // need to turn it from a set into an array
-//        if managedMessageObjects != nil {
-//            var messageArray = self.recipient.messages as! [Message]
-        let eachMessage = managedMessageObjects[indexPath.row]
-            cell.textLabel?.text = eachMessage.content
-
         
+        let eachRecipient = store.recipients[indexPath.row]
+        
+        cell.textLabel?.text = eachRecipient.name
         
         return cell
     }
     
-  
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        let messageVC = segue.destinationViewController as! TableViewController
+        let indexPath = tableView.indexPathForSelectedRow
+        if let indexPath = indexPath {
+            let recipient = store.recipients[indexPath.row]
+            messageVC.recipient = recipient
+
+        }
+        
+        
+        
+        
+    }
 }
+
+

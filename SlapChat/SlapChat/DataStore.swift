@@ -13,6 +13,8 @@ class DataStore {
     
     var messages:[Message] = []
     
+    var recipients: [Recipient] = []
+    
     static let sharedDataStore = DataStore()
     
     
@@ -32,7 +34,33 @@ class DataStore {
         }
     }
     
-    func fetchData ()
+    
+    func fetchDataRecipient() {
+        var error:NSError? = nil
+        
+        let recipientsRequest = NSFetchRequest(entityName: "Recipient")
+        
+        //let createdAtSorter = NSSortDescriptor(key: "createdAt", ascending:true)
+        
+        //Request.sortDescriptors = [createdAtSorter]
+        
+        do{
+            recipients = try managedObjectContext.executeFetchRequest(recipientsRequest) as! [Recipient]
+        }catch let nserror1 as NSError{
+            error = nserror1
+            recipients = []
+        }
+        
+        if recipients.count == 0 {
+            generateTestData()
+        }
+        
+        ////         perform a fetch request to fill an array property on your datastore
+    }
+
+    
+
+    func fetchDataMessages ()
     {
         
         var error:NSError? = nil
@@ -57,25 +85,60 @@ class DataStore {
         ////         perform a fetch request to fill an array property on your datastore
     }
     
+    
     func generateTestData() {
+        
+        let recipientOne: Recipient = NSEntityDescription.insertNewObjectForEntityForName("Recipient", inManagedObjectContext: managedObjectContext) as! Recipient
+        
+        recipientOne.name = "Elli"
+        recipientOne.email = "ElliYO"
+        recipientOne.phoneNumber = "7185555555"
+        recipientOne.twitterHandle = "ElliAtFlatiron"
+        //recipientOne.messages.insert = [Message]
+        
+        
+        let recipientTwo: Recipient = NSEntityDescription.insertNewObjectForEntityForName("Recipient", inManagedObjectContext: managedObjectContext) as! Recipient
+        
+        recipientTwo.name = "Ticia"
+        recipientTwo.email = "LCAtFS"
+        recipientTwo.phoneNumber = "3475555555"
+        recipientTwo.twitterHandle = "ChanceOfT"
+        //recipientTwo.messages = [messages]
+        
+        let recipientThree: Recipient = NSEntityDescription.insertNewObjectForEntityForName("Recipient", inManagedObjectContext: managedObjectContext) as! Recipient
+        
+        recipientThree.name = "Haaris"
+        recipientThree.email = "haarisThankYou"
+        recipientThree.phoneNumber = "5165555555"
+        recipientThree.twitterHandle = "Haarissssssss"
+
+        
+
         
         let messageOne: Message = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: managedObjectContext) as! Message
         
         messageOne.content = "Message 1"
         messageOne.createdAt = NSDate()
+        messageOne.recipient = recipientOne
         
         let messageTwo: Message = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: managedObjectContext) as! Message
         
         messageTwo.content = "Message 2"
         messageTwo.createdAt = NSDate()
+        messageTwo.recipient = recipientTwo
+        
         
         let messageThree: Message = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: managedObjectContext) as! Message
         
         messageThree.content = "Message 3"
         messageThree.createdAt = NSDate()
+        messageThree.recipient = recipientThree
         
-        saveContext()
-        fetchData()
+                saveContext()
+        fetchDataRecipient()
+
+        
+        fetchDataMessages()
     }
     
     // MARK: - Core Data stack
@@ -110,7 +173,7 @@ class DataStore {
             dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
             dict[NSLocalizedFailureReasonErrorKey] = failureReason
             
-            dict[NSUnderlyingErrorKey] = error as NSError
+            dict[NSUnderlyingErrorKey] = error as! NSError
             let wrappedError = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
             // Replace this with code to handle the error appropriately.
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
